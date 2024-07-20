@@ -2,6 +2,7 @@ package bankingsystem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Account {
     private int id;
@@ -9,6 +10,7 @@ public class Account {
     private String accountHolderName;
     private double balance;
     private List<Transaction> transactionHistory;
+    private final ReentrantLock transactionsLock;
 
     public Account(int id, String accountNumber, String accountHolderName, double balance) {
         this.id = id;
@@ -16,22 +18,41 @@ public class Account {
         this.accountHolderName = accountHolderName;
         this.balance = balance;
         this.transactionHistory = new ArrayList<Transaction>();
+        this.transactionsLock = new ReentrantLock();
     }
 
     public void deposit(double value, Account originAccount) {
-        this.setBalance(this.getBalance() + value);
+        this.getTransactionsLock().lock();
 
-        this.addTransactionHistory(new Transaction(TransactionType.DEPOSIT, originAccount, this, value));
+        try {
+            this.setBalance(this.getBalance() + value);
+            this.addTransactionHistory(new Transaction(TransactionType.DEPOSIT, originAccount, this, value));
+        } finally {
+            this.getTransactionsLock().unlock();
+        }
     }
 
-    public void withdraw(double value, Account destinationAccount) throws Exception {
-        this.withdrawBalance(value);
+    public void withdraw(double value) throws Exception {
+        this.getTransactionsLock().lock();
 
-        this.addTransactionHistory(new Transaction(TransactionType.WITHDRAW, this, destinationAccount, value));
+        try {
+            this.withdrawBalance(value);
+            this.addTransactionHistory(new Transaction(TransactionType.WITHDRAW, this, value));
+        } finally {
+            this.getTransactionsLock().unlock();
+        }
     }
 
     public void transfer(Account destinationAccount, double value) throws Exception {
-        this.withdraw(value, destinationAccount);
+        this.getTransactionsLock().lock();
+
+        try {
+            this.withdrawBalance(value);
+            this.addTransactionHistory(new Transaction(TransactionType.TRANSFER, this, destinationAccount, value));
+        } finally {
+            this.getTransactionsLock().unlock();
+        }
+
         destinationAccount.deposit(value, this);
     }
 
@@ -44,24 +65,30 @@ public class Account {
     }
 
     public void showInformation() {
-        System.out.println("Conta: " +
-                "ID: " + this.getId() +
-                "Número: " + this.getAccountNumber() +
-                "Titular da conta:" + this.getAccountHolderName() +
-                "Saldo: R$ " + this.getBalance()
+        System.out.println(
+                "\n\n----------- DADOS DA CONTA ----------" +
+                        "\nID: " + this.getId() +
+                        "\nNúmero: " + this.getAccountNumber() +
+                        "\nTitular da conta:" + this.getAccountHolderName() +
+                        "\nSaldo: R$ " + this.getBalance()
         );
     }
 
     public void showTransactionHistory() {
-        System.out.println("Histórico de transações:");
+        System.out.println("\n------ HISTÓRICO DE TRANSAÇÕES ------");
 
         this.getTransactionHistory().forEach((transaction) -> {
-            System.out.println("Histórico de transações:" +
+            System.out.println(
                     "\nTipo: " + transaction.getTransactionType().getDescription() +
-                    "\nOrigem: " + transaction.getOriginAccount().getAccountNumber() + " - " + transaction.getOriginAccount().getAccountHolderName() +
-                    "\nDestino:" + transaction.getDestinationAccount().getAccountNumber() + " - " + transaction.getDestinationAccount().getAccountHolderName() +
-                    "\nValor: R$ " + transaction.getValue() +
-                    "\nData/hora: " + transaction.getFormattedDateTime()
+                            "\nOrigem: " + transaction.getOriginAccount().getAccountHolderName() + " (ID: " + transaction.getOriginAccount().getId() + ")" +
+                            (
+                                    transaction.getDestinationAccount() != null
+                                            ? "\nDestino: " + transaction.getDestinationAccount().getAccountHolderName() + " (ID: " + transaction.getDestinationAccount().getId() + ")"
+                                            : ""
+                            ) +
+                            "\nValor: R$ " + transaction.getValue() +
+                            "\nData/hora: " + transaction.getFormattedDateTime() +
+                            "\n--------------------------------------"
             );
         });
     }
@@ -78,20 +105,18 @@ public class Account {
         return accountNumber;
     }
 
-    public void setAccountNumber(String accountNumber) {
-        this.accountNumber = accountNumber;
-    }
-
     public String getAccountHolderName() {
         return accountHolderName;
     }
 
-    public void setAccountHolderName(String accountHolderName) {
-        this.accountHolderName = accountHolderName;
-    }
-
     public double getBalance() {
-        return balance;
+        this.getTransactionsLock().lock();
+        
+        try {
+            return balance;
+        } finally {
+            this.getTransactionsLock().unlock();
+        }
     }
 
     public void setBalance(double balance) {
@@ -102,11 +127,11 @@ public class Account {
         return transactionHistory;
     }
 
-    public void setTransactionHistory(List<Transaction> transactionHistory) {
-        this.transactionHistory = transactionHistory;
-    }
-
     public void addTransactionHistory(Transaction transaction) {
         this.getTransactionHistory().add(transaction);
+    }
+
+    public ReentrantLock getTransactionsLock() {
+        return transactionsLock;
     }
 }

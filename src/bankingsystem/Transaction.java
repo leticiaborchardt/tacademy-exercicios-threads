@@ -18,6 +18,14 @@ public class Transaction {
         this.dateTime = LocalDateTime.now();
     }
 
+    public Transaction(TransactionType transactionType, Account originAccount, double value) {
+        this.transactionType = transactionType;
+        this.originAccount = originAccount;
+        this.destinationAccount = null;
+        this.value = value;
+        this.dateTime = LocalDateTime.now();
+    }
+
     public TransactionType getTransactionType() {
         return transactionType;
     }

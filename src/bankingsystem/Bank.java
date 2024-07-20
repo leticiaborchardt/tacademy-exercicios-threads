@@ -1,15 +1,15 @@
 package bankingsystem;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class Bank {
+public class Bank {
     private final Map<Integer, Account> accountList;
     private int accountId;
 
     public Bank() {
-        this.accountList = new HashMap<Integer, Account>();
+        this.accountList = new ConcurrentHashMap<Integer, Account>();
         this.accountId = 1;
     }
 
