@@ -1,0 +1,21 @@
+INFO: Application started
+DEBUG: Initializing components
+ERROR: Null pointer exception occurred
+WARN: Low memory warning
+INFO: User logged in
+DEBUG: Loading configuration
+ERROR: Array index out of bounds
+INFO: Transaction completed
+ERROR: Database connection failed
+INFO: Application stopped
+INFO: User requested data export
+DEBUG: Exporting data to CSV
+ERROR: Failed to export data: File not found
+INFO: User logged out
+WARN: Disk space running low
+INFO: Disk cleanup completed
+ERROR: Unexpected end of input
+INFO: Application restarted
+DEBUG: Checking for updates
+ERROR: Failed to check for updates: Network error
+INFO: Updates installed successfully

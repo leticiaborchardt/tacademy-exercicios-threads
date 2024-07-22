@@ -1,0 +1,20 @@
+INFO: Application started
+ERROR: Unable to load configuration file
+INFO: Default configuration loaded
+DEBUG: Connecting to database
+ERROR: Database connection timeout
+INFO: Retrying database connection
+ERROR: Invalid database credentials
+WARN: User attempted multiple failed logins
+INFO: Password reset initiated
+DEBUG: Sending password reset email
+ERROR: Failed to send email: SMTP server not found
+INFO: User password reset successfully
+INFO: User logged in
+ERROR: Session expired
+INFO: User session renewed
+WARN: High memory usage detected
+DEBUG: Running garbage collection
+INFO: Memory usage normalized
+ERROR: Application crashed due to out of memory error
+INFO: Restarting application

@@ -1,9 +1,12 @@
 import bankingsystem.BankingSystem;
+import logprocessor.LogProcessorSystem;
 
 public class Main {
     public static void main(String[] args) {
-        BankingSystem.run();
+        // Descomentar linhas para executar os exercícios:
 
-//        LogProcessor.run();
+        // BankingSystem.run();
+
+        // LogProcessorSystem.run();
     }
 }
