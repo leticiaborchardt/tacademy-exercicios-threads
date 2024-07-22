@@ -12,7 +12,7 @@ public class LogProcessorSystem {
                 "src/logprocessor/logfiles/log-03.txt"
         );
 
-        String wordSearch = "Erro";
+        String wordSearch = "Error";
 
         try {
             ParallelLogProcessor processor = new ParallelLogProcessor(5);
